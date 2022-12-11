@@ -25,9 +25,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //Upload config routers
-app.use("/api", UserRoutes);
-app.use("/api", PublicationRoutes);
-app.use("/api", FollowRoutes);
+app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1/publication", PublicationRoutes);
+app.use("/api/v1/follow", FollowRoutes);
 
 //Route example
 app.get("/ruta-prueba", (req, res) => {
