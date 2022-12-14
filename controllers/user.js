@@ -11,7 +11,7 @@ const exampleUser = (req, res) => {
   });
 };
 
-//Registre users
+//Register users
 const register = (req, res) => {
   //get data from the request
   const { name, nick, email, password, role } = req.body;
@@ -109,6 +109,7 @@ const login = (req, res) => {
     });
 };
 
+//get by id user
 const getUser = (req, res) => {
   const id = req.params.id;
 
@@ -129,28 +130,103 @@ const getUser = (req, res) => {
     });
 };
 
+//get users by limit and page
 const listUser = (req, res) => {
-  const page = 1;
-  if (req.params.page) {
-    page = req.params.page;
-  }
-  page = parseInt(page);
+  const limit = parseInt(req.query.limit, 10) || 15;
+  const page = parseInt(req.query.page, 10) || 1;
 
-  //number of items per page 
-  const itemsPage = 5;
+  User.paginate({}, { limit, page }, (err, user) => {
+    if (err || !user) {
+      return res.status(404).send({
+        status: "error",
+        message: "no users available",
+      });
+    }
 
-  
-  return res.status(200).send({
-    status: "success",
-    message: "list users",
-    page,
+    return res.status(200).send({
+      status: "success",
+      user,
+    });
   });
 };
 
+//update user in session
+const updateUser = async (req, res) => {
+  //user in session
+  const userSession = req.user;
+  //data new user
+  const userUpdate = req.body;
+
+  delete userSession.iat;
+  delete userSession.exp;
+
+  if (userUpdate.password) {
+    //Encrypt password JWT
+    const pwd = await bcrypt.hash(userUpdate.password, 10);
+    userUpdate.password = pwd;
+  }
+
+  try {
+    //method for find by id and update(id user, obj update, new update user)
+    const userToUpdate = await User.findByIdAndUpdate(
+      userSession.id,
+      userUpdate,
+      { new: true }
+    );
+
+    if (!userToUpdate) {
+      return res.status(400).send({
+        status: "error",
+        message: "update fails",
+      });
+    }
+
+    return res.status(200).send({
+      status: "success",
+      user: userToUpdate,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: "error",
+      message: "update fails",
+    });
+  }
+};
+
+const uploadFile = async (req, res) => {
+  const userSession = req.user;
+
+  if (!req.file) {
+    return res.status(404).send({
+      status: "error",
+      message: "upload not image",
+    });
+  }
+
+  const img = req.file.originalname;
+
+
+  const imgSplit = img.split("\.");
+  const ext = imgSplit[1];
+  
+  if(ext != "png" && ext !="jpg" && ext != "gif"){
+    const filePath =  req.file.path;
+  }
+
+  return res.status(200).send({
+    message: "success",
+    user: userSession,
+    file: req.file,
+    files: req.files,
+    img,
+  });
+};
 module.exports = {
   exampleUser,
   register,
   login,
   getUser,
   listUser,
+  updateUser,
+  uploadFile,
 };
