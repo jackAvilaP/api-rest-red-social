@@ -28,5 +28,5 @@ router.get("/getUser/:id", auth, userController.getUser);
 router.get("/list", auth, userController.listUser);
 router.put("/update", auth, userController.updateUser);
 router.post("/upload", [auth, uploads.single("file0")], userController.uploadFile);
-
+router.get("/avatar/:file", auth, userController.avatar);
 module.exports = router;

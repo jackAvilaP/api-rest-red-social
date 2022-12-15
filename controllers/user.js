@@ -3,6 +3,8 @@ const User = require("../models/user");
 const jwt = require("../services/jwt");
 
 const fs = require("fs");
+const path = require("path");
+
 // const mongoosePagination = require("mongoose-pagination");
 
 //Action example
@@ -171,7 +173,7 @@ const updateUser = async (req, res) => {
   try {
     //method for find by id and update(id user, obj update, new update user)
     const userToUpdate = await User.findByIdAndUpdate(
-      userSession.id,
+      { _id: userSession.id },
       userUpdate,
       { new: true }
     );
@@ -221,17 +223,15 @@ const uploadFile = async (req, res) => {
   }
 
   User.findByIdAndUpdate(
-    userSession.id,
+   {_id: userSession.id},
     { image: req.file.filename },
     { new: true },
-    (error, userUpdate)=>{
-
-
-      if(error || !userUpdate){
+    (error, userUpdate) => {
+      if (error || !userUpdate) {
         return res.status(500).send({
-          status:"error",
-          message:"error in update image"
-        })
+          status: "error",
+          message: "error in update image",
+        });
       }
       return res.status(200).send({
         message: "success",
@@ -240,7 +240,22 @@ const uploadFile = async (req, res) => {
       });
     }
   );
+};
 
+//return the image save in the data base
+const avatar = (req, res) => {
+  const file = req.params.file;
+  const filePath = "./uploads/avatars/" + file;
+
+  fs.stat(filePath, (error, exists) => {
+    if (!exists) {
+      return res.status(404).send({
+        status: "error",
+        message: "image does not exist",
+      });
+    }
+    return res.sendFile(path.resolve(filePath));
+  });
 };
 module.exports = {
   exampleUser,
@@ -250,4 +265,5 @@ module.exports = {
   listUser,
   updateUser,
   uploadFile,
+  avatar,
 };
