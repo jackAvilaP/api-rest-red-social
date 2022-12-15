@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("../services/jwt");
+
+const fs = require("fs");
 // const mongoosePagination = require("mongoose-pagination");
 
 //Action example
@@ -205,21 +207,40 @@ const uploadFile = async (req, res) => {
 
   const img = req.file.originalname;
 
-
-  const imgSplit = img.split("\.");
+  const imgSplit = img.split(".");
   const ext = imgSplit[1];
-  
-  if(ext != "png" && ext !="jpg" && ext != "gif"){
-    const filePath =  req.file.path;
+
+  if (ext != "png" && ext != "jpg" && ext != "gif") {
+    const filePath = req.file.path;
+    const fileDeleted = fs.unlinkSync(filePath);
+
+    return res.status(400).send({
+      status: "error",
+      message: "invalid file extend",
+    });
   }
 
-  return res.status(200).send({
-    message: "success",
-    user: userSession,
-    file: req.file,
-    files: req.files,
-    img,
-  });
+  User.findByIdAndUpdate(
+    userSession.id,
+    { image: req.file.filename },
+    { new: true },
+    (error, userUpdate)=>{
+
+
+      if(error || !userUpdate){
+        return res.status(500).send({
+          status:"error",
+          message:"error in update image"
+        })
+      }
+      return res.status(200).send({
+        message: "success",
+        user: userUpdate,
+        file: req.file,
+      });
+    }
+  );
+
 };
 module.exports = {
   exampleUser,
