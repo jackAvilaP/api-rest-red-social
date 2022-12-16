@@ -56,13 +56,13 @@ const stopFollow = (req, res) => {
 
 //list of users i`m following
 const listFollowing = (req, res) => {
-  const userSession = req.user.id;
+  // user in session or passing the id
+  const searchUser = req.params.id || req.user.id;
 
   const limit = parseInt(req.query.limit, 10) || 15;
   const page = parseInt(req.query.page, 10) || 1;
 
-  Follow.paginate({ user: userSession }, { limit, page }, (error, follow) => {
-
+  Follow.paginate({ user: searchUser }, { limit, page }, (error, follow) => {
     if (error || !follow) {
       return res.status(404).send({
         status: "error",
@@ -74,39 +74,26 @@ const listFollowing = (req, res) => {
       follow,
     });
   });
-
-  // Follow.find({
-  //   user: userSession,
-  // }).exec((error, getFollow) => {
-  //   if (error || !getFollow) {
-  //     return res.status(400).send({
-  //       status: "error",
-  //       message: "Error list of users i`m following",
-  //     });
-  //   }
-  //   return res.status(200).send({
-  //     status: "success",
-  //     getFollow,
-  //   });
-  // });
 };
 
 // list of users who follow me
 const meFollow = (req, res) => {
-  const userSession = req.user.id;
+  // user in session or passing the id
+  const searchUser = req.params.id || req.user.id;
 
-  Follow.find({
-    followed: userSession,
-  }).exec((error, getFollow) => {
-    if (error || getFollow) {
-      return res.status(400).send({
+  const limit = parseInt(req.query.limit, 10) || 15;
+  const page = parseInt(req.query.page, 10) || 1;
+
+  Follow.paginate({ followed: searchUser }, { limit, page }, (error, followed) => {
+    if (error || !followed) {
+      return res.status(404).send({
         status: "error",
-        message: "Error list of users who follow me",
+        message: "no follow",
       });
     }
     return res.status(200).send({
       status: "success",
-      getFollow,
+      followed,
     });
   });
 };
