@@ -23,10 +23,14 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 
 router.get("/getUser/:id", auth, userController.getUser);
-
+router.get("/count/:id?", auth, userController.count);
 //Paginacion opcional por query es decir http://localhost:3800/api/v1/user/list?limit=6&page=2
 router.get("/list", auth, userController.listUser);
 router.put("/update", auth, userController.updateUser);
-router.post("/upload", [auth, uploads.single("file0")], userController.uploadFile);
-router.get("/avatar/:file", auth, userController.avatar);
+router.post(
+  "/upload",
+  [auth, uploads.single("file0")],
+  userController.uploadFile
+);
+router.get("/avatar/:file", userController.avatar);
 module.exports = router;

@@ -1,9 +1,14 @@
 const bcrypt = require("bcrypt");
+
 const User = require("../models/user");
+const Follow = require("../models/follow");
+
 const jwt = require("../services/jwt");
 
 const fs = require("fs");
 const path = require("path");
+const publication = require("../models/publication");
+const { deleteMany } = require("../models/publication");
 
 // const mongoosePagination = require("mongoose-pagination");
 
@@ -168,6 +173,8 @@ const updateUser = async (req, res) => {
     //Encrypt password JWT
     const pwd = await bcrypt.hash(userUpdate.password, 10);
     userUpdate.password = pwd;
+  } else {
+    delete userUpdate.password;
   }
 
   try {
@@ -223,7 +230,7 @@ const uploadFile = async (req, res) => {
   }
 
   User.findByIdAndUpdate(
-   {_id: userSession.id},
+    { _id: userSession.id },
     { image: req.file.filename },
     { new: true },
     (error, userUpdate) => {
@@ -257,6 +264,32 @@ const avatar = (req, res) => {
     return res.sendFile(path.resolve(filePath));
   });
 };
+
+const count = async (req, res) => {
+  //user in session
+  const userSession = req.user.id || req.params.id;
+
+  try {
+    const following = await Follow.count({ user: userSession });
+
+    const followed = await Follow.count({ followed: userSession });
+
+    const publications = await publication.count({ user: userSession });
+
+    return res.status(200).send({
+      status: "success",
+      userSession,
+      following,
+      followed,
+      publications,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: "error",
+      message: "no count",
+    });
+  }
+};
 module.exports = {
   exampleUser,
   register,
@@ -266,4 +299,5 @@ module.exports = {
   updateUser,
   uploadFile,
   avatar,
+  count,
 };
