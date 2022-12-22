@@ -26,7 +26,7 @@ const register = (req, res) => {
   const { name, nick, email, password, role } = req.body;
 
   //validate request data
-  if (!name || !nick || !email || !role || !password) {
+  if (!name || !nick || !email || !password) {
     return res.status(400).json({
       message: "missing data :( ",
     });
