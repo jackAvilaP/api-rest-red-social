@@ -107,7 +107,7 @@ const login = (req, res) => {
 
       return res.status(200).send({
         status: "success",
-        message: "Action login",
+        message: "success",
         user: {
           id: user._id,
           name: user.name,
