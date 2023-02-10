@@ -177,6 +177,23 @@ const updateUser = async (req, res) => {
     delete userUpdate.password;
   }
 
+  if (userUpdate.name === '') {
+    delete userUpdate.name
+  }
+
+  if (userUpdate.nick === '') {
+    delete userUpdate.nick
+  }
+
+  if (userUpdate.email === '') {
+    delete userUpdate.email
+  }
+
+  if (userUpdate.image === '') {
+    delete userUpdate.image
+  }
+
+
   try {
     //method for find by id and update(id user, obj update, new update user)
     const userToUpdate = await User.findByIdAndUpdate(
