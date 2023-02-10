@@ -178,19 +178,19 @@ const updateUser = async (req, res) => {
   }
 
   if (userUpdate.name === '') {
-    delete userUpdate.name
+    delete userUpdate.name;
   }
 
   if (userUpdate.nick === '') {
-    delete userUpdate.nick
+    delete userUpdate.nick;
   }
 
   if (userUpdate.email === '') {
-    delete userUpdate.email
+    delete userUpdate.email;
   }
 
   if (userUpdate.image === '') {
-    delete userUpdate.image
+    userUpdate.image = 'default.png';
   }
 
 
@@ -200,7 +200,7 @@ const updateUser = async (req, res) => {
       { _id: userSession.id },
       userUpdate,
       { new: true }
-    );
+    ).select({ password: 0 });
 
     if (!userToUpdate) {
       return res.status(400).send({
@@ -208,6 +208,7 @@ const updateUser = async (req, res) => {
         message: "update fails",
       });
     }
+
 
     return res.status(200).send({
       status: "success",
