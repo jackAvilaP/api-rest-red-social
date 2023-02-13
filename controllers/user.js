@@ -177,22 +177,21 @@ const updateUser = async (req, res) => {
     delete userUpdate.password;
   }
 
-  if (userUpdate.name === '') {
+  if (userUpdate.name === "") {
     delete userUpdate.name;
   }
 
-  if (userUpdate.nick === '') {
+  if (userUpdate.nick === "") {
     delete userUpdate.nick;
   }
 
-  if (userUpdate.email === '') {
+  if (userUpdate.email === "") {
     delete userUpdate.email;
   }
 
-  if (userUpdate.image === '') {
-    userUpdate.image = 'default.png';
+  if (userUpdate.image === "") {
+    userUpdate.image = "default.png";
   }
-
 
   try {
     //method for find by id and update(id user, obj update, new update user)
@@ -208,7 +207,6 @@ const updateUser = async (req, res) => {
         message: "update fails",
       });
     }
-
 
     return res.status(200).send({
       status: "success",
