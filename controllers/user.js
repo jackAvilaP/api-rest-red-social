@@ -143,8 +143,9 @@ const getUser = (req, res) => {
 const listUser = (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 15;
   const page = parseInt(req.query.page, 10) || 1;
-
-  User.paginate({}, { limit, page }, (err, user) => {
+  
+  // select: "-password " does not send this value
+  User.paginate({}, { select: "-password", limit, page }, (err, user) => {
     if (err || !user) {
       return res.status(404).send({
         status: "error",
